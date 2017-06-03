@@ -1,0 +1,29 @@
+<!doctype html>
+<html>
+	<head>
+		<script src="//code.jquery.com/jquery-3.2.1.min.js"></script>
+		<script src="//code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/canvasjs/1.7.0/jquery.canvasjs.min.js"></script>
+		<script src="j/script.js"></script>
+		<style>
+			@import "//code.jquery.com/ui/1.12.1/themes/black-tie/jquery-ui.css";
+			*{font-family:sans-serif;}
+			table{border:0 solid #000;border-width:1px 0 0 1px;border-spacing:0;}
+			td,th{border:0 solid #000;border-width:0 1px 1px 0;padding:2px 5px;}
+			#data-table td:nth-child(3), #data-table td:nth-child(4), #data-table td:nth-child(5), #data-table td:nth-child(6), #data-table td:nth-child(7) {text-align:right}
+			tr.hide{display:none;color:#666;font-style:italic;background:#eee}
+			tr.highlight{background:#cfc}
+			table.show-hidden tr.hide{display:table-row}
+			tr:hover td{background:#9cf}
+			.ui-tooltip{opacity:.01!important}
+			.ui-tooltip.no-opacity{opacity:1!important}
+		</style>
+	</head>
+	<body>
+		<select id="stats-to-show">
+			<option></option>
+		</select>
+		<button id="upload">upload</button>
+		<div id="data-view"></div>
+	</body>
+</html>
