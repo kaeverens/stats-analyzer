@@ -1,7 +1,7 @@
 # stats-analyzer
 analyzes statistics from Google's Webmaster Search Analytics tool to provide hints as to what needs work
 
-it does not include any user authentication, so either run it on your laptop, or add your own authentication
+it does not include any user authentication, or request sanitation, so either run it on your laptop, or add your own authentication. do NOT run this on the open Internet.
 
 to use this, you need a PHP/MySQL server.
 
