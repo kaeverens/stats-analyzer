@@ -30,7 +30,7 @@ Example table (from my [LiveForever](http://liveforeverbook.info) project (just 
 
 highlighted rows show keywords that can probably be improved easily. In the example image, the second row could be improved by either writing a blog based around it (improving its position), or by finding out how it looks in Google's results and changing the wording in the original document to be more appealing (encouraging more clicks).
 
-"importance" is a figure based on a calculation I came up with to boil down how valuable a keyword is to just one number. It's based on 28 sums and averages, and looks like this:
+"importance" is a figure based on a calculation I came up with to boil down how valuable a keyword is to just one number. It's based on 28-day sums and averages, and looks like this:
 ```
 (1+clicks/impressions)*(impressions/position)
 ```
