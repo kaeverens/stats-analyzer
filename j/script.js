@@ -25,7 +25,7 @@ $(()=>{
 								$site.change();
 							});
 						$dialog.find('form')
-							.append($('<input name="list_id" type="hidden"/>').val($('#stats-to-show').val()))
+							.append($('<input name="site_id" type="hidden"/>').val($('#stats-to-show').val()))
 							.submit();
 					}
 				}
@@ -157,15 +157,15 @@ $(()=>{
 		function calculateHighlights() {
 			var $trs=$table.find('tr').not('.hide');
 			$trs.removeClass('highlight').data('title', '');
-			for (var i=2;i<$trs.length;++i) {
+			for (var i=1;i<$trs.length;++i) {
 				var comments=[], highlight=0;
-				var $tr=$($trs[i]), $prevTr=$($trs[i-1]);
-				if (+$tr.find('td:nth-child(3)').text() > +$prevTr.find('td:nth-child(3)').text()) {
-					comments.push('improve clicks by checking how this is visible in Google and adjusting the text');
+				var $tr=$($trs[i]);
+				if (i<$trs.length-1 && +$tr.find('td:nth-child(3)').text() < +$($trs[i+1]).find('td:nth-child(3)').text()) {
+					comments.push('improve clicks. check how this appears in a Google search and adjust the text in the linked document to make it more obvious that it is the right page');
 					highlight++;
 				}
-				if (+$tr.find('td:nth-child(4)').text() > +$prevTr.find('td:nth-child(4)').text()) {
-					comments.push('write a blog post that includes this keyword');
+				if (i>1 && +$tr.find('td:nth-child(4)').text() > +$($trs[i-1]).find('td:nth-child(4)').text()) {
+					comments.push('improve position by learning something new about this keyword\'s subject and writing about it, using the keyword');
 					highlight++;
 				}
 				if (highlight) {
