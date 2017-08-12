@@ -26,17 +26,38 @@ CREATE TABLE `data` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `cdate` datetime DEFAULT NULL,
   `keyword_id` int(11) DEFAULT '0',
-  `clicks` int(11) DEFAULT '0',
-  `impressions` int(11) DEFAULT '0',
+  `clicks` float DEFAULT '0',
+  `impressions` float DEFAULT '0',
   `position` int(11) DEFAULT '0',
   `site_id` int(11) DEFAULT NULL,
-  `clicks28` int(11) DEFAULT '0',
-  `impressions28` int(11) DEFAULT '0',
+  `clicks28` float DEFAULT '0',
+  `impressions28` float DEFAULT '0',
   `position28` float DEFAULT '0',
   `importance` float DEFAULT '0',
+  `data_type` smallint(6) DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `keyword_list_date` (`keyword_id`,`site_id`,`cdate`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `groups`
+--
+
+DROP TABLE IF EXISTS `groups`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `groups` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `site_id` int(11) DEFAULT '0',
+  `name` text,
+  `importance` float DEFAULT '0',
+  `position` float DEFAULT '0',
+  `impressions` float DEFAULT '0',
+  `clicks` float DEFAULT '0',
+  `last_impression` date DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -53,6 +74,7 @@ CREATE TABLE `keywords` (
   `last_seen` date DEFAULT NULL,
   `importance` float DEFAULT '0',
   `hide` smallint(6) DEFAULT '0',
+  `group_id` int(11) DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -81,4 +103,4 @@ CREATE TABLE `sites` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-06-03 17:54:25
+-- Dump completed on 2017-08-12 13:45:50
