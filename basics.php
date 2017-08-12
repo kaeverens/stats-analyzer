@@ -83,10 +83,7 @@ function dbOne($query, $field = '', $cache = FALSE) {
   return $r[$field];
 }
 function dbLastInsertId() {
-  return (int)dbOne(
-    sprintf('/* %s */ select last_insert_id() as id', MYSQLND_MS_MASTER_SWITCH),
-    'id'
-  );
+  return (int)dbOne('select last_insert_id() as id', 'id');
 }
 function dbInit() {
   if (isset($GLOBALS['db'])) {

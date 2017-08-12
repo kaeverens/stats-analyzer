@@ -47,35 +47,76 @@ $(()=>{
 	});
 	var $site=$('#stats-to-show'), site_val=$site.val();
 	var tooltips=0, charts=0;
-	var keywordData=[];
+	window.keywordData=[];
 	$site.change(()=>{
 		var site_id=+$site.val(), $wrapper=$('#data-view').empty();
 		if (!site_id) {
 			return;
 		}
-		var table='<table id="data-table"><thead><tr><th>Keyword</th><th>Last Impression</th><th>Clicks<th>Impressions</th><th>Position</th><th>Importance</th><th>Hide<input type="checkbox" id="show-hidden"/></th></tr></thead><tbody></tbody></table>';
+		var table='<table id="data-table" style="width:100%"><thead>'
+			+'<tr class="overall"><th>Keyword</th><th>Group</th><th>Last Impression</th><th class="clicks">Clicks<th class="impressions">Impressions</th><th class="position">Position</th><th class="importance">Importance</th><th>Hide<input type="checkbox" id="show-hidden"/></th></tr>'
+			+'</thead><tbody></tbody></table>';
 		var $table=$(table).appendTo($wrapper);
 		$.post('/stats-get.php', {
 			'site_id':site_id
-		}, (data)=>{
-			var trs=[];
-			for (var i=0;i<data.length;++i) {
-				var $tr=$('<tr/>');
-				$tr.data('id', data[i].id);
-				if (+data[i].hide) {
-					$tr.addClass('hide');
-				}
-				$('<td/>').text(data[i].name).appendTo($tr);
-				$('<td/>').text(data[i].last_seen).appendTo($tr);
-				$('<td/>').text(data[i].clicks28).appendTo($tr);
-				$('<td/>').text(data[i].impressions28).appendTo($tr);
-				$('<td/>').text((+data[i].position28).toFixed(2)).appendTo($tr);
-				$('<td/>').text((+data[i].importance).toFixed(2)).appendTo($tr);
-				$('<td/>').append($('<input class="hide" type="checkbox"/>').prop('checked', +data[i].hide)).appendTo($tr);
+		}, (ret)=>{
+			var trs=[], data=ret.keywords, groups=ret.groups;
+			groups.push({
+				'id':0,
+				'name':' -- '
+			});
+			var groupNames=[];
+			for (var i=0;i<groups.length;++i) {
+				groupNames[+groups[i].id]=groups[i].name;
+			}
+			for (var j=0;j<groups.length;++j) {
+				var group=groups[j];
+				var $tr=$('<tr class="category-header"/>');
+				$tr.data('id', group.id);
+				$('<td class="keyword"/>').text(group.name).appendTo($tr);
+				$('<td class="group"/>').text('').appendTo($tr);
+				$('<td class="last_impression"/>').text(group.last_impression).appendTo($tr);
+				$('<td class="clicks"/>').text(group.clicks).appendTo($tr);
+				$('<td class="impressions"/>').text(group.impressions).appendTo($tr);
+				$('<td class="position"/>').text(group.position).appendTo($tr);
+				$('<td class="importance"/>').text(group.importance).appendTo($tr);
+				$('<td class="showhide"/>').append(
+					$('<button>hide</button>')
+						.click(function() {
+							var $this=$(this), type=$this.text(), $tr=$this.closest('tr');
+							var $next=$tr.next('tr');
+							while ($next.length && !$next.hasClass('category-header')) {
+								$next.removeClass('category-hide category-show').addClass('category-'+type)
+								$next=$next.next('tr');
+							}
+							type=type=='hide'?'show':'hide';
+							$this.text(type);
+							return false;
+						})
+				).appendTo($tr);
 				trs.push($tr);
+				for (var i=0;i<data.length;++i) {
+					if (data[i].group_id!=group.id) {
+						continue;
+					}
+					var $tr=$('<tr/>');
+					$tr.data('id', data[i].id);
+					if (+data[i].hide) {
+						$tr.addClass('hide');
+					}
+					$('<td class="keyword"/>').text(data[i].name).appendTo($tr);
+					$('<td class="group"/>').data('group', data[i].group_id).text(groupNames[+data[i].group_id]||' -- ').appendTo($tr);
+					$('<td class="last_impression"/>').text(data[i].last_seen.replace(/^....-/, '')).appendTo($tr);
+					$('<td class="clicks"/>').text(data[i].clicks28).appendTo($tr);
+					$('<td class="impressions"/>').text(data[i].impressions28).appendTo($tr);
+					$('<td class="position"/>').text((+data[i].position28).toFixed(2)).appendTo($tr);
+					$('<td class="importance"/>').text((+data[i].importance).toFixed(2)).appendTo($tr);
+					$('<td class="hide"/>').append($('<input class="hide" type="checkbox"/>').prop('checked', +data[i].hide)).appendTo($tr);
+					trs.push($tr);
+				}
 			}
 			$table.find('tbody').append(trs);
-			$table.find('input.hide').change(function() {
+			$table.on('change', 'input.hide', function() {
 				var $tr=$(this).closest('tr').removeClass('hide');
 				var id=$tr.data('id'), hide=$(this).is(':checked');
 				$.post('/keyword-hide.php', {
@@ -88,7 +129,7 @@ $(()=>{
 				});
 				calculateHighlights();
 			});
-			$table.find('#show-hidden').click(function() {
+			$table.on('click', '#show-hidden', function() {
 				var val=+$(this).is(':checked');
 				$table.removeClass('show-hidden');
 				if (val) {
@@ -97,13 +138,22 @@ $(()=>{
 				calculateHighlights();
 			});
 			calculateHighlights();
-			$table.find('tbody tr').tooltip({
+			$table.tooltip({
 				'items':'*',
 				'show':0,
 				'track':true,
 				'content':function() {
-					var $tr=$(this).closest('tr');
-					var tooltip=$tr.data('title'), keyword_id=$tr.data('id');
+					var $td=$(this).closest('td,th'), class_name=$td.attr('class'), $tr=$td.closest('tr'), tooltip=$tr.data('title'), keyword_id=$tr.data('id')||0;
+					if (class_name===undefined || class_name=='keyword' || class_name=='last_impression' || class_name=='hide' || class_name=='group' || class_name=='showhide') {
+						return false;
+					}
+					var data_type=0;
+					if ($tr.hasClass('overall')) {
+						data_type=1;
+					}
+					if ($tr.hasClass('category-header')) {
+						data_type=2;
+					}
 					var html='<div id="tooltip'+tooltips+'">'+(tooltip?'<em>'+tooltip.replace("\n", '<br/>')+'</em>':'')+'</div>';
 					var thisTooltip='#tooltip'+tooltips;
 					tooltips++;
@@ -124,8 +174,8 @@ $(()=>{
 						};
 						for (var i=0;i<data.length;++i) {
 							config.data[0].dataPoints.push({
-								'x':new Date(data[i].cdate),
-								'y':+data[i].importance
+								'x':new Date(data[i][0]),
+								'y':+data[i][1]
 							});
 						}
 						$('<div id="chart'+charts+'" style="width:300px;height:150px"/>').appendTo(thisTooltip);
@@ -133,18 +183,22 @@ $(()=>{
 						charts++;
 						$(thisTooltip).closest('.ui-tooltip').addClass('no-opacity');
 					}
-					if (keywordData[keyword_id]) {
+					var idx=site_id+'|'+class_name+'|'+data_type+'|'+keyword_id;
+					if (keywordData[idx]) {
 						setTimeout(function() {
-							showGraph(keywordData[keyword_id]);
+							showGraph(keywordData[idx]);
 						}, 1);
 					}
 					else {
 						setTimeout(function() {
 							if ($(thisTooltip).is(':visible')) {
 								$.post('/keyword-getData.php', {
-									'id':keyword_id
+									'id':keyword_id,
+									'site_id':site_id,
+									'data_type':data_type,
+									'type':class_name
 								}, (data)=>{
-									keywordData[keyword_id]=data;
+									keywordData[idx]=data;
 									showGraph(data);
 								});
 							}
@@ -153,6 +207,64 @@ $(()=>{
 					return html;
 				}
 			});
+			$table.on('click', 'td.group', function() {
+				var $this=$(this);
+				if ($this.data('clicked')) {
+					return;
+				}
+				$this.data('clicked', true);
+				var group_id=+$this.data('group');
+				$.post('/groups-list.php', {
+					'site_id':site_id
+				}, function(ret) {
+					ret.push({
+						'id':'-1',
+						'name':' -- Add Group -- '
+					});
+					var $sel=$('<select style="width:90%"><option value="0"/></select>');
+					for (var i=0;i<ret.length;++i) {
+						$('<option value="'+ret[i].id+'"/>').text(ret[i].name).appendTo($sel);
+					}
+					$sel
+						.appendTo($this.empty())
+						.on('change', function() {
+							var val=+$sel.val();
+							if (val==-1) {
+								var group_name=prompt('What is the new group name');
+								if (!group_name || group_name===null) {
+									return $this.empty().text(groupNames[group_id] || ' -- ').data('clicked', false);
+								}
+								$.post('/group-add.php', {
+									'site_id':site_id,
+									'name':group_name
+								}, function(ret) {
+									group_id=ret.id;
+									groupNames[group_id]=ret.name;
+									$this.data('group', group_id);
+									$.post('/keyword-group-set.php', {
+										'keyword_id':$this.closest('tr').data('id'),
+										'group_id':group_id
+									}, function() {
+										return $this.empty().text(groupNames[group_id] || ' -- ').data('clicked', false);
+									});
+								});
+							}
+							else {
+								group_id=val;
+								$.post('/keyword-group-set.php', {
+									'keyword_id':$this.closest('tr').data('id'),
+									'group_id':group_id
+								}, function() {
+									return $this.empty().text(groupNames[group_id] || ' -- ').data('clicked', false);
+								});
+							}
+						})
+						.val(group_id);
+				});
+			});
+			setTimeout(function() {
+				$table.find('button').click();
+			}, 1);
 		});
 		function calculateHighlights() {
 			var $trs=$table.find('tr').not('.hide');
