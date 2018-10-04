@@ -1,12 +1,13 @@
 <!doctype html>
 <html>
 	<head>
-		<script src="//code.jquery.com/jquery-3.2.1.min.js"></script>
-		<script src="//code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
-		<script src="//cdnjs.cloudflare.com/ajax/libs/canvasjs/1.7.0/jquery.canvasjs.min.js"></script>
+		<script src="j/jquery-ui-1.12.1.custom/external/jquery/jquery.js"></script>
+		<script src="j/jquery-ui-1.12.1.custom/jquery-ui.min.js"></script>
+		<script src="j/jquery.canvasjs.min.js"></script>
 		<script src="j/script.js"></script>
+		<script src="j/simple-statistics.min.js"></script>
 		<style>
-			@import "//code.jquery.com/ui/1.12.1/themes/black-tie/jquery-ui.css";
+			@import "j/jquery-ui-1.12.1.custom/jquery-ui.min.css";
 			*{font-family:sans-serif;}
 			body{
 				padding-bottom:200px;
@@ -25,6 +26,19 @@
 			tr:hover td{background:#9cf}
 			.ui-tooltip{opacity:.01!important; font-size:10px}
 			.ui-tooltip.no-opacity{opacity:1!important}
+			.fade{
+				color:#999;
+			}
+			.trend.lowest{
+				color:red;
+				text-shadow:0 0 2px #fff, 1px 1px 0 #fff;
+				font-weight:bold;
+			}
+			.trend.highest{
+				color:green;
+				text-shadow:0 0 2px #fff, 1px 1px 0 #fff;
+				font-weight:bold;
+			}
 		</style>
 	</head>
 	<body>

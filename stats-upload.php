@@ -3,7 +3,6 @@ require_once 'basics.php';
 $handle = fopen($_FILES["file"]["tmp_name"], "r");
 $date=$_REQUEST['date'];
 
-$linenum=0;
 $site_id=intval($_REQUEST['site_id']);
 $data = fgetcsv($handle, 1000, ",");
 dbQuery('delete from data where site_id='.$site_id.' and cdate="'.$date.'"');

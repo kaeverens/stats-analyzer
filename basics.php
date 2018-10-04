@@ -1,5 +1,6 @@
 <?php
 require_once 'config.php';
+require_once 'vendor/autoload.php';
 
 function dbRow($query, $cache = FALSE) {
   if (!preg_match('/ limit 1$/', $query)) {
@@ -24,7 +25,6 @@ function dbRow($query, $cache = FALSE) {
   return $r;
 }
 function dbQuery($query, $cache = FALSE, $pid = 0, $returnCount=false) {
-if (strpos($query, '79680')!==false) error_log($query);
   $db = dbInit();
   $q  = $db->query($query);
   if ($q === FALSE) { // failed
